@@ -70,7 +70,7 @@ var middleware = {
     validateUserToken: function (req, res, callback) {
         console.log(req.body);
         var end_point = req.path.split('/');
-        var uni_end_point = new Array("loginuser", "signup","verifyotp");
+        var uni_end_point = new Array("login", "signup","verifyotp");
 
         var valid_token = (req.header['token'] != undefined && req.header['token'] != "") ? req.header['token'] : "";
 

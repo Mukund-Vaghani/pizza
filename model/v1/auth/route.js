@@ -49,4 +49,23 @@ router.post('/verifyotp',function(req,res){
 
 })
 
+router.get('/login', function (req, res) {
+    var request = req.body;
+    var rules = {
+        email: 'required|email',
+        password: 'required'
+    };
+
+    var message = {
+        require:'You forgot the :attr field',
+        email:'email is not valid'
+    };
+
+    if (middleware.checkValidationRules(res, request, rules, message)) {
+        auth.login(request, function (code, message, data) {
+            middleware.send_response(req, res, code, message, data);
+        })
+    }
+})
+
 module.exports = router;

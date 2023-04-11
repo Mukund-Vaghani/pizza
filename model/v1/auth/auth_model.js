@@ -86,6 +86,25 @@ var auth = {
         })
     },
 
+    login: function (request, callback) {
+        con.query(`SELECT * FROM tbl_user WHERE email = ? AND password = ? `, [request.email, request.password], function (error, result) {
+            if (!error && result.length > 0) {
+                common.sendEmail(request.email, "Login to PizzaPoint", `${result[0].user_name} login successfully`, function (isSent) {
+                    if (isSent) {
+                        var id = result[0].id;
+                        common.checkUpdateToken(id, request, function (token) {
+                            result[0].token = token;
+                            callback("1", "user login successfully", result);
+                        });
+                    } else {
+                        callback("0", "login failed", null);
+                    }
+                })
+            } else {
+                callback("0", "wrong user detail", null);
+            }
+        })
+    },
 
     checkUserEmail: function (request, callback) {
         con.query(`SELECT * FROM tbl_user WHERE email = ?`, [request.email], function (error, result) {
