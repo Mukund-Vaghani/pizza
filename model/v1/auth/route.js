@@ -1,3 +1,4 @@
+const { request } = require('express');
 var express = require('express');
 var router = express.Router();
 var middleware = require('../../../middleware/middleware');
@@ -159,6 +160,13 @@ router.post('/dishdetail', function(req,res){
     var request = req.body;
     console.log(request);
     auth.getDishDetail(request, function(code,message,data){
+        middleware.send_response(req,res,code,message,data);
+    })
+})
+
+router.post('/logout', function(req,res){
+    var request = req.body;
+    auth.logoutUser(request, function(code,message,data){
         middleware.send_response(req,res,code,message,data);
     })
 })

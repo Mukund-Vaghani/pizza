@@ -276,6 +276,22 @@ var auth = {
                 callback("0","failed",null);
             }
         })
+    },
+
+    logoutUser: function(request,callback){
+        var id = request.id;
+        var upddata={
+            token:"",
+            device_token:""
+        }
+        con.query(`UPDATE tbl_user_deviceinfo SET ? WHERE user_id = ?`,[upddata,id], function(error, result){
+            if(!error){
+                callback("1","logo out",null)
+            }else{
+                console.log(error)
+                callback("0","log out failed",null)
+            }
+        })
     }
 }
 
