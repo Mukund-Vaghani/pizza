@@ -106,4 +106,21 @@ router.post('/resetpass/:id', function (req, res) {
     })
 })
 
+router.post('/resendotp', function(req,res){
+    var request = req.body;
+
+    var rules = {
+        user_id:'required'
+    }
+
+    var message ={
+        require:'You forgot the :attr field'
+    }
+
+    if(middleware.checkValidationRules(res, request, rules,message)){
+        auth.resendotp(request, function(code,message,data){
+            middleware.send_response(req,res,code,message,data);
+        })
+    }
+})
 module.exports = router;

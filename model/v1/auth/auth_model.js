@@ -141,7 +141,7 @@ var auth = {
         var request = req.body;
         con.query(`SELECT * FROM tbl_user WHERE email = ? AND is_active = 1`, [request.email], function (error, result) {
             if (!error && result.length > 0) {
-                require('../../../config/template').forgotPass(result,function(forgottemplate){
+                require('../../../config/template').forgotPass(result, function (forgottemplate) {
                     common.sendEmail(request.email, "Forgot Password", forgottemplate, function (isSent) {
                         if (isSent) {
                             var onetime = {
@@ -180,6 +180,40 @@ var auth = {
                 callback("1", "reset_keyword_success_message", null);
             } else {
                 console.log(error);
+                callback('0', 'something went wrong , please try again later', error)
+            }
+        })
+    },
+
+    resendotp: function (request, callback) {
+        var otp_code = common.randomeOTPGenerator();
+        con.query(`SELECT * FROM tbl_user WHERE id = ?`, [request.user_id], function (error, result) {
+            if (!error && result.length > 0) {
+                common.sendEmail(result[0].email, "email Verification", `<h4>Your OTP is : <h2>${otp_code}</h2></h4>`, function (isSent) {
+                    if (isSent) {
+                        var userDetail = {
+                            otp: otp_code
+                        }
+                        auth.userDetailupdate(request.user_id,userDetail, function (isupdate) {
+                            if (isupdate) {
+                                auth.getUserDetail(request.user_id, function (code, message, user_data) {
+                                    if (user_data != null) {
+                                        callback('1', 'OTP send successfully', user_data);
+                                    } else {
+                                        console.log(error);
+                                        callback('0', 'something went wrong', null)
+                                    }
+                                })
+                            } else {
+                                console.log(error);
+                                callback('0', 'user data not found', null)
+                            }
+                        })
+                    } else {
+                        callback('0', 'something went wrong , please try again later', error)
+                    }
+                });
+            } else {
                 callback('0', 'something went wrong , please try again later', error)
             }
         })
