@@ -9,11 +9,14 @@ app.engine('html',require('ejs').renderFile);
 app.set('view engine','html');
 
 var auth = require('./model/v1/auth/route');
+var food = require('./model/v1/food/route');
+
 
 app.use('/',require('./middleware/middleware').validateApiKey);
 app.use('/',require('./middleware/middleware').validateUserToken);
 
 app.use('/api/v1/auth',auth);
+app.use('/api/v1/food',food);
 
 try{
     app.listen(process.env.PORT);
