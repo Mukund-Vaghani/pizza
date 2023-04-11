@@ -5,6 +5,8 @@ const port = 8188;
 
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
+app.engine('html',require('ejs').renderFile);
+app.set('view engine','html');
 
 var auth = require('./model/v1/auth/route');
 

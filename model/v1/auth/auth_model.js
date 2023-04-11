@@ -135,6 +135,54 @@ var auth = {
                 callback(false);
             }
         })
+    },
+
+    forgotpassword: function (req, callback) {
+        var request = req.body;
+        con.query(`SELECT * FROM tbl_user WHERE email = ? AND is_active = 1`, [request.email], function (error, result) {
+            if (!error && result.length > 0) {
+                require('../../../config/template').forgotPass(result,function(forgottemplate){
+                    common.sendEmail(request.email, "Forgot Password", forgottemplate, function (isSent) {
+                        if (isSent) {
+                            var onetime = {
+                                is_forgot: "1",
+                                token_time: new Date()
+                            }
+                            // console.log(onetime.token_time);
+                            con.query(`UPDATE tbl_user SET is_forgot = ?, token_time = ? WHERE id = ? `, [onetime.is_forgot, onetime.token_time, result[0].id], function (error, result) {
+                                if (!error) {
+                                    callback("1", "reset_keyword_success_message", result);
+                                } else {
+                                    callback('0', "reset_keyword_something_wrong_message", error)
+                                }
+                            });
+                        } else {
+                            // console.log(error);
+                            callback('0', "reset_keyword_something_wrong_message", error)
+                        }
+                    })
+                })
+            } else {
+                console.log(error);
+                callback("0", "reset_keyword_something_wrong_message", error)
+            }
+        })
+    },
+
+    // reset password
+    resetpassword: function (request, id, callback) {
+        // console.log("authmodel",request);
+        var onetime = {
+            is_forgot: "0"
+        }
+        con.query(`UPDATE tbl_user SET password = ?, is_forgot = ? WHERE id = ${id} `, [request.resetpass, onetime.is_forgot], function (error, result) {
+            if (!error) {
+                callback("1", "reset_keyword_success_message", null);
+            } else {
+                console.log(error);
+                callback('0', 'something went wrong , please try again later', error)
+            }
+        })
     }
 }
 

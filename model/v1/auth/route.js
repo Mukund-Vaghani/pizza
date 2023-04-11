@@ -68,4 +68,42 @@ router.get('/login', function (req, res) {
     }
 })
 
+router.post('/forgotpass', function (req, res) {
+    auth.forgotpassword(req, function (code, message, data) {
+        middleware.send_response(req, res, code, message, data);
+    })
+})
+
+router.get('/resetform/:id', function (req, res) {
+    auth.getUserDetail(req.params.id, function (code, message,userdata) {
+        if (userdata != null) {
+            var token_time = userdata.token_time;
+            var current_time = new Date();
+            // console.log("token_time",userdata.token_time);
+            // console.log("current_time",current_time);
+            var diffTime = current_time.getHours() - token_time.getHours();
+            // console.log(diffTime);
+            if (diffTime < '1') {
+                if (userdata[0].is_forgot == '1') {
+                    res.render('forgotpass.html', { id: req.params.id });
+                } else {
+                    res.send("your link is already used");
+                }
+            } else {
+                res.send("your link is expired");
+            }
+        } else {
+            console.log('error');
+        }
+    })
+})
+
+router.post('/resetpass/:id', function (req, res) {
+    var request = req.body;
+    var id = req.params.id;
+    auth.resetpassword(request, id, function (code, message, data) {
+        middleware.send_response(req, res, code, message, data);
+    })
+})
+
 module.exports = router;

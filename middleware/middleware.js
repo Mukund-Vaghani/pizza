@@ -1,4 +1,5 @@
 var Validator = require('Validator');
+var con = require('../config/database');
 
 
 var middleware = {
@@ -68,17 +69,18 @@ var middleware = {
     },
 
     validateUserToken: function (req, res, callback) {
-        console.log(req.body);
         var end_point = req.path.split('/');
-        var uni_end_point = new Array("login", "signup","verifyotp");
+        var uni_end_point = new Array("login", "signup","verifyotp","resetform", "resetpass");
 
-        var valid_token = (req.header['token'] != undefined && req.header['token'] != "") ? req.header['token'] : "";
+        var valid_token = (req.headers['token'] != undefined && req.headers['token'] != "") ? req.headers['token'] : "";
 
+        // console.log(valid_token);
+        // console.log(uni_end_point.indexOf(end_point[4])=='-1');
         if (uni_end_point.includes(end_point[4])) {
             callback();
         } else {
             if (valid_token != "") {
-                con.query(`SELCET * FROM tbl_user_deviceinfo WHERE token = ?`, [valid_token], function (error, result) {
+                con.query(`SELECT * FROM tbl_user_deviceinfo WHERE token = ?`, [valid_token], function (error, result) {
                     if (!error && result.length > 0) {
                         req.user_id = result[0].user_id;
                         callback()
