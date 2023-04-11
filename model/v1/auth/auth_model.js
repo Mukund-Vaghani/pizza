@@ -279,7 +279,7 @@ var auth = {
     },
 
     logoutUser: function(request,callback){
-        var id = request.id;
+        var id = request.user_id;
         var upddata={
             token:"",
             device_token:""
