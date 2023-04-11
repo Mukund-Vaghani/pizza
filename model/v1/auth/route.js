@@ -77,12 +77,9 @@ router.post('/forgotpass', function (req, res) {
 router.get('/resetform/:id', function (req, res) {
     auth.getUserDetail(req.params.id, function (code, message,userdata) {
         if (userdata != null) {
-            var token_time = userdata.token_time;
+            var token_time = userdata[0].token_time;
             var current_time = new Date();
-            // console.log("token_time",userdata.token_time);
-            // console.log("current_time",current_time);
             var diffTime = current_time.getHours() - token_time.getHours();
-            // console.log(diffTime);
             if (diffTime < '1') {
                 if (userdata[0].is_forgot == '1') {
                     res.render('forgotpass.html', { id: req.params.id });
@@ -99,10 +96,17 @@ router.get('/resetform/:id', function (req, res) {
 })
 
 router.post('/resetpass/:id', function (req, res) {
+
     var request = req.body;
     var id = req.params.id;
-    auth.resetpassword(request, id, function (code, message, data) {
-        middleware.send_response(req, res, code, message, data);
+    auth.getUserDetail(id,function(code,message,user_data){
+        if(user_data[0].is_forgot == '1'){
+            auth.resetpassword(request, id, function (code, message, data) {
+                middleware.send_response(req, res, code, message, data);
+            })
+        }else{
+            res.send("link is already used");
+        }
     })
 })
 
@@ -122,5 +126,40 @@ router.post('/resendotp', function(req,res){
             middleware.send_response(req,res,code,message,data);
         })
     }
+})
+
+router.post('/adddish', function(req,res){
+    var request = req.body;
+
+    var rules = {
+        dish_name:'required',
+        dish_title:'required',
+        dish_description:'required',
+        disc_price:'required'
+    }
+
+    var message ={
+        require:'You forgot the :attr field'
+    }
+
+    if(middleware.checkValidationRules(res, request, rules,message)){
+        auth.addDish(request, function(code,message,data){
+            middleware.send_response(req,res,code,message,data);
+        })
+    }
+})
+
+router.get('/dishlisting',function(req,res){
+    auth.dishListing(req,function(code,message,data){
+        middleware.send_response(req,res,code,message,data);
+    })
+})
+
+router.post('/dishdetail', function(req,res){
+    var request = req.body;
+    console.log(request);
+    auth.getDishDetail(request, function(code,message,data){
+        middleware.send_response(req,res,code,message,data);
+    })
 })
 module.exports = router;

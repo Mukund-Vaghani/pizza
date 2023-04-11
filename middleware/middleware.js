@@ -25,7 +25,7 @@ var middleware = {
     },
 
     send_response: function (req, res, code, message, data) {
-        console.log(data);
+        // console.log(data);
             if (data == null) {
                 var response_data = {
                     code: code,
@@ -70,7 +70,7 @@ var middleware = {
 
     validateUserToken: function (req, res, callback) {
         var end_point = req.path.split('/');
-        var uni_end_point = new Array("login", "signup","verifyotp","resetform", "resetpass");
+        var uni_end_point = new Array("login", "signup","verifyotp","resetform", "resetpass","adddish","dishlisting","dishdetail");
 
         var valid_token = (req.headers['token'] != undefined && req.headers['token'] != "") ? req.headers['token'] : "";
 
