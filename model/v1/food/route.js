@@ -39,11 +39,4 @@ router.post('/dishdetail', function(req,res){
     })
 })
 
-router.post('/logout', function(req,res){
-    var request = req.body;
-    auth.logoutUser(request, function(code,message,data){
-        middleware.send_response(req,res,code,message,data);
-    })
-})
-
 module.exports = router;
